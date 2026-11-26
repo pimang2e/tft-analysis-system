@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime, timezone
 from urllib.parse import quote
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from .database import Database
@@ -103,8 +104,17 @@ class RiotMatchCollector:
                 "User-Agent": "TFT-Coach/0.1",
             },
         )
-        with urlopen(request, timeout=20) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen(request, timeout=20) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as error:
+            if error.code == 401:
+                raise RuntimeError("Riot API 키가 만료됐거나 유효하지 않습니다") from error
+            if error.code == 403:
+                raise RuntimeError("이 Riot API 키로 해당 엔드포인트에 접근할 권한이 없습니다") from error
+            if error.code == 429:
+                raise RuntimeError("Riot API 요청 제한에 도달했습니다. 잠시 후 다시 시도하세요") from error
+            raise RuntimeError(f"Riot API 요청 실패: HTTP {error.code}") from error
 
     def collect_challenger_matches(self, match_limit: int = 20) -> dict:
         platform = self.platform_hosts.get(self.region)
