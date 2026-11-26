@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tft-coach"
+version = "0.1.0"
+description = "TFT meta data collection and situational coaching system"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+tft-coach = "tftcoach.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tftcoach"]
