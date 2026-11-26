@@ -31,8 +31,48 @@ CREATE TABLE IF NOT EXISTS observations (
     collected_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS riot_players (
+    puuid TEXT PRIMARY KEY,
+    region TEXT NOT NULL,
+    rank_tier TEXT NOT NULL,
+    rank TEXT,
+    wins INTEGER,
+    losses INTEGER,
+    collected_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS riot_matches (
+    match_id TEXT PRIMARY KEY,
+    patch TEXT,
+    set_number TEXT,
+    region TEXT NOT NULL,
+    game_length REAL,
+    payload TEXT NOT NULL,
+    collected_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS match_participants (
+    match_id TEXT NOT NULL,
+    puuid TEXT NOT NULL,
+    region TEXT NOT NULL,
+    rank_tier TEXT,
+    placement INTEGER NOT NULL,
+    level INTEGER,
+    last_round INTEGER,
+    gold_left INTEGER,
+    total_damage INTEGER,
+    traits_json TEXT NOT NULL,
+    units_json TEXT NOT NULL,
+    augments_json TEXT NOT NULL,
+    collected_at TEXT NOT NULL,
+    PRIMARY KEY(match_id, puuid)
+);
+
 CREATE INDEX IF NOT EXISTS idx_observations_context
 ON observations(patch, region, rank_tier, stage, round_type);
+
+CREATE INDEX IF NOT EXISTS idx_match_participants_context
+ON match_participants(region, rank_tier, placement, last_round);
 """
 
 

@@ -1,3 +1,6 @@
+import pytest
+
+from tftcoach.collector import RiotMatchCollector
 from tftcoach.database import Database
 from tftcoach.models import GameContext
 from tftcoach.recommender import Recommender
@@ -37,3 +40,11 @@ def test_observed_action_is_ranked_by_samples(tmp_path):
 
     assert recommendations[0].action == "레벨업"
     assert recommendations[0].sample_count == 2
+
+
+def test_match_collector_requires_api_key(monkeypatch, tmp_path):
+    monkeypatch.delenv("RIOT_API_KEY", raising=False)
+    collector = RiotMatchCollector(database=Database(tmp_path / "test.sqlite3"))
+
+    with pytest.raises(RuntimeError, match="RIOT_API_KEY"):
+        collector.collect_challenger_matches(match_limit=1)

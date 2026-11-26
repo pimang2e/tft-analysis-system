@@ -20,5 +20,12 @@ A data-driven Teamfight Tactics analysis and coaching project.
 
 ```powershell
 python -m tftcoach.cli collect --locale ko_KR
+python -m tftcoach.cli collect-matches --region KR --match-limit 20
 python -m tftcoach.cli recommend --stage 3-5 --health 42 --gold 35 --level 7
+
+`collect-matches`를 실행하려면 Riot API 키를 환경변수로 설정하세요:
+
+```powershell
+$env:RIOT_API_KEY="RGAPI-..."
+```
 ```
