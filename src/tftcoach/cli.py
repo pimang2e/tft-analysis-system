@@ -16,6 +16,10 @@ def build_parser() -> argparse.ArgumentParser:
     matches.add_argument("--region", default="KR")
     matches.add_argument("--match-limit", type=int, default=20)
 
+    web = subparsers.add_parser("web", help="Run the local TFT Coach web interface")
+    web.add_argument("--host", default="127.0.0.1")
+    web.add_argument("--port", type=int, default=8000)
+
     recommend = subparsers.add_parser("recommend", help="Recommend a situational action")
     recommend.add_argument("--stage", default="3-5")
     recommend.add_argument("--round-type", default="pvplive")
@@ -37,6 +41,12 @@ def main() -> None:
             f"특성 {result['trait_count']}개, 증강 {result['augment_count']}개, "
             f"아이템 {result['item_count']}개)"
         )
+        return
+
+    if args.command == "web":
+        import uvicorn
+
+        uvicorn.run("tftcoach.web:app", host=args.host, port=args.port, reload=False)
         return
 
     if args.command == "collect-matches":
@@ -65,7 +75,8 @@ def main() -> None:
     for rank, item in enumerate(recommendations[:5], start=1):
         print(
             f"{rank}. {item.action} | 점수 {item.score:.3f} | "
-            f"표본 {item.sample_count} | 신뢰도 {item.confidence} | {item.reason}"
+            f"표본 {item.sample_count} | 신뢰도 {item.confidence} | "
+            f"실행순서 {item.execution_order} | 선행: {', '.join(item.prerequisites) or '없음'} | {item.reason}"
         )
 
 
